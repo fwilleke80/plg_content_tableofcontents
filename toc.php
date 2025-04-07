@@ -22,9 +22,12 @@ defined('_JEXEC') or die;
  * The "prefix" parameter inserts an additional string before the chapter numbers (like
  * e.g. a paragraph character "§").
  *
+ * Note: The chapter numbers will always be included in the anchor names so that chapters
+ * with the same name are uniquely addressable.
+ *
  * @package     Joomla.Plugin
  * @subpackage  Content.Toc
- * @version     1.0.1
+ * @version     1.0.2
  * @author      Frank Willeke
  * @license     GNU/GPL 2
  */
@@ -92,29 +95,30 @@ class PlgContentToc extends CMSPlugin
                 continue;
             }
 
-            // Update chapter counters if numbering is enabled.
+            // Always update chapter counters for anchor generation.
+            $chapterCount[$level] = isset($chapterCount[$level]) ? $chapterCount[$level] + 1 : 1;
+            // Reset counters for deeper levels.
+            for ($i = $level + 1; $i <= 6; $i++)
+            {
+                $chapterCount[$i] = 0;
+            }
+
+            // Build numbering parts for both display and slug.
+            $numberParts = array();
+            for ($i = 1; $i <= $level; $i++)
+            {
+                if (isset($chapterCount[$i]) && $chapterCount[$i] > 0)
+                {
+                    $numberParts[] = $chapterCount[$i];
+                }
+            }
+            $numberString = implode('.', $numberParts);  // e.g. "1.1"
+            $numberSlug   = implode('-', $numberParts);    // e.g. "1-1"
+
+            // Use chapter numbers for display only if enabled.
             if ($chapterNumbers)
             {
-                $chapterCount[$level] = isset($chapterCount[$level]) ? $chapterCount[$level] + 1 : 1;
-                // Reset counters for deeper levels.
-                for ($i = $level + 1; $i <= 6; $i++)
-                {
-                    $chapterCount[$i] = 0;
-                }
-
-                // Build numbering prefix for display.
-                $numberParts = array();
-                for ($i = 1; $i <= $level; $i++)
-                {
-                    if (isset($chapterCount[$i]) && $chapterCount[$i] > 0)
-                    {
-                        $numberParts[] = $chapterCount[$i];
-                    }
-                }
-
-                $displayNumber = $prefix . ' ' . implode('.', $numberParts) . '. ';
-                // Use only the non-zero parts to build the anchor name.
-                $numberSlug = implode('-', $numberParts);
+                $displayNumber = $prefix . ' ' . $numberString . '. ';
             }
             else
             {
@@ -124,15 +128,8 @@ class PlgContentToc extends CMSPlugin
             // Generate a slug from the header text.
             $slug = $this->slugify($headerContent);
 
-            // Build the anchor name.
-            if ($chapterNumbers)
-            {
-                $anchorName = $numberSlug . '-' . $slug;
-            }
-            else
-            {
-                $anchorName = $slug;
-            }
+            // Always include chapter numbers in the anchor.
+            $anchorName = $numberSlug . '-' . $slug;
 
             // If chapter numbering is enabled, update the header text.
             $modifiedContent = $displayNumber . $headerContent;
@@ -190,7 +187,6 @@ class PlgContentToc extends CMSPlugin
         foreach ($matches as $match)
         {
             $params[$match[1]] = $match[3];
-            // echo($match[1] . " = " . $match[3]);
         }
         return $params;
     }
@@ -286,4 +282,4 @@ class PlgContentToc extends CMSPlugin
 
         return $html;
     }
-} // class PlgContentToc
+}
