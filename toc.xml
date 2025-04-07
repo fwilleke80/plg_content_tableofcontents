@@ -7,6 +7,7 @@
     <copyright>(C) 2025 Frank Willeke</copyright>
     <license>GNU General Public License version 2 or later; see LICENSE.txt</license>
     <authorUrl>www.frankwilleke.com</authorUrl>
+    <authorEmail>joomla-plugins@frankwilleke.de</authorEmail>
     <description>PLG_CONTENT_TOC_DESC</description>
     <files>
         <filename plugin="toc">toc.php</filename>
@@ -17,4 +18,7 @@
         <language tag="de-DE">language/de-DE/de-DE.plg_content_toc.ini</language>
         <language tag="de-DE">language/de-DE/de-DE.plg_content_toc.sys.ini</language>
     </languages>
+    <updateservers>
+        <server type="extension" name="Web Links Update Site">https://raw.githubusercontent.com/joomla-extensions/weblinks/master/manifest.xml</server>
+    </updateservers>
 </extension>
