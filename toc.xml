@@ -2,7 +2,7 @@
 <extension type="plugin" group="content" method="upgrade">
     <name>PLG_CONTENT_TOC</name>
     <author>Frank Willeke</author>
-    <version>0.0.1</version>
+    <version>1.0.1</version>
     <creationDate>April 2025</creationDate>
     <copyright>(C) 2025 Frank Willeke</copyright>
     <license>GNU General Public License version 2 or later; see LICENSE.txt</license>
@@ -14,5 +14,7 @@
     <languages>
         <language tag="en-GB">language/en-GB/en-GB.plg_content_toc.ini</language>
         <language tag="en-GB">language/en-GB/en-GB.plg_content_toc.sys.ini</language>
+        <language tag="de-DE">language/de-DE/de-DE.plg_content_toc.ini</language>
+        <language tag="de-DE">language/de-DE/de-DE.plg_content_toc.sys.ini</language>
     </languages>
 </extension>

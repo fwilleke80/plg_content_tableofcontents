@@ -7,19 +7,26 @@ defined('_JEXEC') or die;
  *
  * Usage:
  *   {toc}
- *   {toc maxlevel=2 chapternumbers=true}
+ *   {toc maxlevel=3}
+ *   {toc minlevel=2 maxlevel=4 chapternumbers=true prefix=§}
  *
  * The plugin scans the article for header tags (h1 to h6), inserts an anchor before each header,
  * and replaces the {toc} tag with a nested list linking to the headers.
  *
+ * The "minlevel" parameter tells the plugin to ignore headers lower than a given level,
+ * while "maxlevel" defines the highest header level to process.
+ *
  * If the parameter "chapternumbers" is true the plugin prefixes header text (and the anchors)
- * with a chapter numbering (e.g. "1. " for h1, "1.1. " for h2, etc.).
+ * with chapter numbering (e.g. "1. " for h1, "1.1. " for h2, etc.).
+ * 
+ * The "prefix" parameter inserts an additional string before the chapter numbers (like
+ * e.g. a paragraph character "§").
  *
  * @package     Joomla.Plugin
  * @subpackage  Content.Toc
- * @version     1.0.0
- * @author      Your Name
- * @license     GNU/GPL
+ * @version     1.0.1
+ * @author      Frank Willeke
+ * @license     GNU/GPL 2
  */
 use Joomla\CMS\Plugin\CMSPlugin;
 
@@ -56,7 +63,9 @@ class PlgContentToc extends CMSPlugin
         // Parse parameters (if any) provided in the {toc ...} tag.
         $tocParams = $this->parseParams(isset($tocMatch[1]) ? $tocMatch[1] : '');
         $maxLevel = isset($tocParams['maxlevel']) ? (int)$tocParams['maxlevel'] : 6;
+        $minLevel = isset($tocParams['minlevel']) ? (int)$tocParams['minlevel'] : 1;
         $chapterNumbers = isset($tocParams['chapternumbers']) && strtolower($tocParams['chapternumbers']) === 'true';
+        $prefix = isset($tocParams['prefix']) ? $tocParams['prefix'] : '';
 
         // Find all header tags in the content.
         $headers = array();
@@ -77,8 +86,8 @@ class PlgContentToc extends CMSPlugin
             preg_match('/h([1-6])/i', $tag, $levelMatch);
             $level = (int)$levelMatch[1];
 
-            // Only process headers up to the maximum level.
-            if ($level > $maxLevel)
+            // Only process headers within the specified min and max levels.
+            if ($level < $minLevel || $level > $maxLevel)
             {
                 continue;
             }
@@ -92,6 +101,7 @@ class PlgContentToc extends CMSPlugin
                 {
                     $chapterCount[$i] = 0;
                 }
+
                 // Build numbering prefix for display.
                 $numberParts = array();
                 for ($i = 1; $i <= $level; $i++)
@@ -101,8 +111,10 @@ class PlgContentToc extends CMSPlugin
                         $numberParts[] = $chapterCount[$i];
                     }
                 }
-                $displayNumber = implode('.', $numberParts) . '. ';
-                $numberSlug = rtrim(str_replace('.', '-', implode('.', $chapterCount)), '-');
+
+                $displayNumber = $prefix . ' ' . implode('.', $numberParts) . '. ';
+                // Use only the non-zero parts to build the anchor name.
+                $numberSlug = implode('-', $numberParts);
             }
             else
             {
@@ -147,9 +159,11 @@ class PlgContentToc extends CMSPlugin
         {
             // Create the anchor tag.
             $anchorTag = '<a name="' . $header['anchor'] . '"></a>';
+
             // Rebuild the header tag with the updated inner content.
             $newHeaderTag = '<' . $header['tag'] . $header['attributes'] . '>' . $header['title'] . '</' . $header['tag'] . '>';
             $replacement = $anchorTag . $newHeaderTag;
+
             // Replace only the first occurrence of this header.
             $content = preg_replace('/' . preg_quote($header['fullTag'], '/') . '/', $replacement, $content, 1);
         }
@@ -176,6 +190,7 @@ class PlgContentToc extends CMSPlugin
         foreach ($matches as $match)
         {
             $params[$match[1]] = $match[3];
+            // echo($match[1] . " = " . $match[3]);
         }
         return $params;
     }
@@ -191,12 +206,16 @@ class PlgContentToc extends CMSPlugin
     {
         // Convert to lowercase.
         $text = strtolower($text);
+
         // Remove any HTML tags.
         $text = strip_tags($text);
+
         // Replace non-alphanumeric characters with hyphens.
         $text = preg_replace('/[^a-z0-9]+/i', '-', $text);
+
         // Trim hyphens from beginning and end.
         $text = trim($text, '-');
+
         return $text;
     }
 
@@ -205,6 +224,7 @@ class PlgContentToc extends CMSPlugin
      *
      * This method creates a nested unordered list (<ul>) where each list item (<li>)
      * contains a link to the corresponding header anchor.
+     * It automatically adjusts the nesting based on the lowest header level found.
      *
      * @param   array  $headers  Array of headers (each with level, anchor, and title).
      *
@@ -212,23 +232,35 @@ class PlgContentToc extends CMSPlugin
      */
     protected function buildTOC(array $headers) : string
     {
+        if (empty($headers))
+        {
+            return '';
+        }
+
+        // Determine the base level from the headers (lowest level in the TOC).
+        $levels = array_map(function($header) {
+            return $header['level'];
+        }, $headers);
+        $baseLevel = min($levels);
+
         $html = "";
-        $prevLevel = 0;
+        $prevRelativeLevel = 0;
 
         foreach ($headers as $header)
         {
-            $currentLevel = $header['level'];
+            // Calculate relative level: the topmost header becomes level 1.
+            $currentRelativeLevel = $header['level'] - $baseLevel + 1;
 
-            if ($currentLevel > $prevLevel)
+            if ($currentRelativeLevel > $prevRelativeLevel)
             {
-                for ($i = $prevLevel; $i < $currentLevel; $i++)
+                for ($i = $prevRelativeLevel; $i < $currentRelativeLevel; $i++)
                 {
                     $html .= "\n<ul>\n";
                 }
             }
-            else if ($currentLevel < $prevLevel)
+            else if ($currentRelativeLevel < $prevRelativeLevel)
             {
-                for ($i = $currentLevel; $i < $prevLevel; $i++)
+                for ($i = $currentRelativeLevel; $i < $prevRelativeLevel; $i++)
                 {
                     $html .= "\n</li>\n</ul>\n";
                 }
@@ -243,15 +275,15 @@ class PlgContentToc extends CMSPlugin
             }
 
             $html .= '<li><a href="#' . $header['anchor'] . '">' . $header['title'] . '</a>';
-            $prevLevel = $currentLevel;
+            $prevRelativeLevel = $currentRelativeLevel;
         }
 
-        // Close any open lists.
-        for ($i = 0; $i < $prevLevel; $i++)
+        // Close any remaining open lists.
+        for ($i = 0; $i < $prevRelativeLevel; $i++)
         {
             $html .= "\n</li>\n</ul>\n";
         }
 
         return $html;
     }
-}
+} // class PlgContentToc
