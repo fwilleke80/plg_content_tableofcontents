@@ -27,7 +27,7 @@ defined('_JEXEC') or die;
  *
  * @package     Joomla.Plugin
  * @subpackage  Content.Toc
- * @version     1.0.3
+ * @version     1.0.4
  * @author      Frank Willeke
  * @license     GNU/GPL 2
  */
