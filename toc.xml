@@ -2,8 +2,8 @@
 <extension type="plugin" group="content" method="upgrade">
     <name>PLG_CONTENT_TOC</name>
     <author>Frank Willeke</author>
-    <version>1.0.4</version>
-    <creationDate>7. April 2025</creationDate>
+    <version>1.0.6</version>
+    <creationDate>24. June 2025</creationDate>
     <copyright>(C) 2025 Frank Willeke</copyright>
     <license>GNU General Public License version 2 or later; see LICENSE.txt</license>
     <authorUrl>www.frankwilleke.com</authorUrl>
