@@ -30,6 +30,14 @@ Set this to `true` to include chapter numbers in the headings and Table of Conte
 * __prefix__
 If `chapternumbers=true`, this lets you define an additional string that will be inserted before a chapter number.
 
+### Excluding headings
+
+If you want to exclude a heading from the TOC, you can use the class `no-toc`, like so:
+
+```html
+<h1 class="no-toc">A heading that won't appear in the TOC</h1>
+```
+
 ## License
 
 Published under GNU Public License 2 (see LICENSE.txt).
