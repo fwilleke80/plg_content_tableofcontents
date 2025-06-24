@@ -9,6 +9,8 @@
     <authorUrl>www.frankwilleke.com</authorUrl>
     <authorEmail>joomla-plugins@frankwilleke.de</authorEmail>
     <description>PLG_CONTENT_TOC_DESC</description>
+    <folder>content</folder>
+    <group>content</group>
     <files>
         <filename plugin="toc">toc.php</filename>
     </files>
