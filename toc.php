@@ -81,10 +81,18 @@ class PlgContentToc extends CMSPlugin
         // Process each header found
         foreach ($matches as $match)
         {
-            $tag = $match[1]; // e.g. h1, h2, etc.
-            $attributes = $match[2]; // any attributes inside the header tag
-            $headerContent = $match[3]; // the inner HTML/text of the header
+            $tag = strtolower($match[1]); // E.g. h1, h2, etc.
+            $attributes = $match[2]; // Any attributes inside the header tag
+            $headerContent = $match[3]; // The inner HTML/text of the header
 
+            if (preg_match('/class\s*=\s*["\']([^"\']*)["\']/', $attributes, $classMatch))
+            {
+                $classList = explode(' ', $classMatch[1]);
+                if (in_array('no-toc', $classList))
+                {
+                    continue; // skip this heading
+                }
+            }
             // Determine header level (1-6)
             preg_match('/h([1-6])/i', $tag, $levelMatch);
             $level = (int)$levelMatch[1];
