@@ -2,7 +2,8 @@
 <extension type="plugin" group="content" method="upgrade">
     <name>PLG_CONTENT_TOC</name>
     <author>Frank Willeke</author>
-    <version>1.0.7</version>
+    <version>1.0.8</version>
+    <targetplatform name="joomla" version="5\.0|6\.0" />
     <creationDate>24. June 2025</creationDate>
     <copyright>(C) 2025 Frank Willeke</copyright>
     <license>GNU General Public License version 2 or later; see LICENSE.txt</license>
