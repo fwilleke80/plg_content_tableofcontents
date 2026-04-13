@@ -21,4 +21,7 @@
         <language tag="de-DE">language/de-DE/de-DE.plg_content_toc.ini</language>
         <language tag="de-DE">language/de-DE/de-DE.plg_content_toc.sys.ini</language>
     </languages>
+    <updateservers>
+        <server type="extension" name="Table of Contents Updates">https://frankwilleke.de/joomla-extensions/plg_content_tableofcontents_update.xml</server>
+    </updateservers>
 </extension>
