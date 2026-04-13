@@ -242,7 +242,8 @@ class PlgContentToc extends CMSPlugin
         }
 
         // Determine the base level from the headers (lowest level in the TOC)
-        $levels = array_map(function($header) {
+        $levels = array_map(function($header)
+        {
             return $header['level'];
         }, $headers);
         $baseLevel = min($levels);
