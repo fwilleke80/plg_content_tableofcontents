@@ -3,6 +3,7 @@
     <name>PLG_CONTENT_TOC</name>
     <author>Frank Willeke</author>
     <version>1.0.8</version>
+    <targetplatform name="joomla" version="5\.0|6\.0" />
     <creationDate>13. April 2026</creationDate>
     <copyright>(C) 2026 Frank Willeke</copyright>
     <license>GNU General Public License version 2 or later; see LICENSE.txt</license>
@@ -20,7 +21,4 @@
         <language tag="de-DE">language/de-DE/de-DE.plg_content_toc.ini</language>
         <language tag="de-DE">language/de-DE/de-DE.plg_content_toc.sys.ini</language>
     </languages>
-    <updateservers>
-        <server type="extension" name="Web Links Update Site">https://raw.githubusercontent.com/joomla-extensions/weblinks/master/manifest.xml</server>
-    </updateservers>
 </extension>
